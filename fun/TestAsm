@@ -1,0 +1,161 @@
+.arch armv6
+.fpu vfp
+
+
+.data
+.balign 4
+__stringPointer: 
+	.word 0
+
+.text
+strPtr : .word __stringPointer
+LengthString : .asciz "Length of entered string: %d\nEntered: \"%s\""
+ByteOffset : .asciz "Src: %d, towards: %d\n"
+
+
+.balign 4
+//.global main
+.global streamcpy
+.global sumf
+
+// SUMF
+// Single-point summation using VFP instructions
+// Input chart:
+// r0: Pointer to start of data (float* data)
+// r1: Number of items (uint32_t length)
+// 
+// Working store:
+//   R5: Index (int i)
+//   F6: Accumulator (float acc)
+//   R10: Return address
+//
+// Returns:
+// f0: FP32 sum
+.global sumf
+.func sumf
+sumf:
+	// Initialize FP register
+	mov r5, #0
+	vmov s0, r5
+
+	// Compute maximum address
+	lsl r1, #2
+	add r1, r0
+
+	// Preserve link register, call and return
+	mov r10, lr
+	bl sumf_inner
+	mov lr, r10
+	vmov r0, s0
+	bx lr
+
+// R0: Current
+// R1: Max
+// S0: Acc
+sumf_inner:
+	vldr.F32 s1, [r0]
+	vadd.F32 s0, s1
+	add r0, #4
+	cmp r0, r1
+	bne sumf_inner
+	bxeq lr	
+
+.endfunc
+
+/// STREAMCPY
+/// r0: source
+/// r1: destination
+/// r2: size<bytes>
+///
+/// Local variables:
+///    r5: Index into array
+///    r6: Return address
+///
+.func streamcpy
+streamcpy:
+	mov r5, #0
+	mov r6, lr
+	bl stream_inner
+	mov lr, r6
+	bx lr
+
+/// STREAM_INNER
+stream_inner:
+	
+	ldr r11, [r0,r5]
+	str r11, [r1,r5]
+	add r5, #1
+	cmp r5, r2
+	bne stream_inner
+	bxeq lr
+.endfunc
+
+.func main
+
+main:
+	stmfd	sp!, {fp, lr}
+	add	fp, sp, #4
+	mov r7, #0
+	mov r0, #512
+	bl malloc
+	mov r8, r0
+
+	ldr r4, strPtr		// Load address of strPtr into register 4
+	str r0, [r4]		// Store malloc's return addr into Mem(R4)/strPtr
+
+	bl getline
+
+	mov r0, #512
+	bl malloc
+	mov r10, r0		// R11 has other pointer
+	mov r0, r4
+	mov r1, r10
+	mov r2, #512
+	bl streamcpy
+
+	mov r0, r10
+	bl puts
+
+	ldr r0, strPtr
+	bl strlen
+
+	mov r1, r0		// Entry length
+	sub r1, #1
+	adr r0, LengthString	// Load constant string
+	ldr r2, strPtr		// Load entered string allocated
+	bl printf
+
+	ldmfd	sp!, {fp, pc}
+	bx lr
+
+.endfunc
+
+.func getline
+
+getline:
+	mov r5, lr		// Preserve link register so we know where to return to 
+        bl getchar		// Get character
+	mov r6, r0		// Index
+
+	ldr r8, strPtr		// Get pointer to string => R8
+	strb r6, [r8, r7]	// Store char in R8+R7: Pointer + offset
+
+	add r7, #1		// Increment array offset
+	
+	mov lr, r5		// Restore link register so we can branch back to caller
+	
+        cmp r0, #10		// Compare last character to NEWLINE
+        bne getline		// If not equal, loop
+
+	add r7, #1		// Null pad
+	mov r6, #0
+	strb r6, [r8,r7]	
+
+        bxeq lr			// If equal, return to caller
+	bx lr
+
+.endfunc
+
+.func po
+	
+.endfunc
