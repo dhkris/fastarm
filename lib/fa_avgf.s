@@ -1,10 +1,11 @@
+// Fastarm 1.0
+// Copyright (c) David H. Christensen, 2015.
+// Licensed under the MIT license
 .arch armv6
 .fpu vfp
 
 .balign 4
 .text
-
-Debug : .asciz "Src: %d, towards: %d, sum: %f\n"
 
 .balign 4
 .data
@@ -30,11 +31,10 @@ avgf_inner:
 	vadd.F32 s0, s1				// Add to accumulator
 	add r0, #4				// Increment
 	cmp r0, r1				// Compare current addr to max addr
-		bne avgf_inner				// Loop
-		vmov s9, r3				// Move item count bits into FP register
-		vcvt.F32.U32 s8, s9			// Convert item count to FP32
-		vdiv.F32 s0, s0, s8				// Divide sum by count
-		bxeq lr					// Branch back
+    bne avgf_inner				// Loop
+    vmov s9, r3				// Move item count bits into FP register
+    vcvt.F32.U32 s8, s9			// Convert item count to FP32
+    vdiv.F32 s0, s0, s8				// Divide sum by count
+    bxeq lr					// Branch back
 
-	
 .endfunc

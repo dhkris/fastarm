@@ -1,4 +1,4 @@
-// Fastarm 1.0
+x// Fastarm 1.0
 // Copyright (c) David H. Christensen, 2015.
 // Licensed under the MIT license
 //
@@ -26,9 +26,9 @@
 .func va_vecmultiplyf
 
 fa_vecmultiplyf:
-	MOV			r5, #0
-	LSL			r3, #2
-	MOV			r8, lr
+	MOV			r5,     #0
+	LSL			r3,     #2
+	MOV			r8,     lr
 	BL			.fa_vecmultiplyf_loop
 	BX			r8
 
@@ -37,11 +37,11 @@ fa_vecmultiplyf:
 	VLDR.F32	s1,		[r1]
 	VMUL.F32	s2,		s1,		s0
 	VSTR		s2,		[r2]
-	ADD			r5, #4
-	ADD			r0, #4
-	ADD			r1, #4
-	ADD			r2, #4	
-	CMP			r5, r3
+	ADD			r5,     #4
+	ADD			r0,     #4
+	ADD			r1,     #4
+	ADD			r2,     #4
+	CMP			r5,     r3
 	BXEQ		lr
 	B			.fa_vecmultiplyf_loop
 

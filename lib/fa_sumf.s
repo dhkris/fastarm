@@ -1,10 +1,6 @@
-//
-// fastarm
-// Fast ARM math building blocks
-//
-// Copyright (c) David H. Christensen
+// Fastarm 1.0
+// Copyright (c) David H. Christensen, 2015.
 // Licensed under the MIT license
-//
 .arch armv6
 .fpu vfp
 
