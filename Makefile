@@ -11,7 +11,18 @@ TESTBINOUT=testbin
 LIBOUT=bin
 
 # Build everything
-all: test_sumf test_avgf test_productf test_sqrt32 test_vecmultiplyf test_vecfusedmultiplyf
+all: test_sumf test_avgf test_productf test_sqrt32 test_vecmultiplyf test_vecfusedmultiplyf library
+
+library: lib_sqrt32.o lib_sumf.o lib_avgf.o lib_maximumf.o lib_productf.o lib_vecmultiplyf.o lib_vecfusedmultiplyopsf.o lib_crypt_rc4.o
+	cc -shared -o ${LIBOUT}/libfastarm.so \
+	${BUILDTMP}/lib_sqrt32.o \
+	${BUILDTMP}/lib_sumf.o \
+	${BUILDTMP}/lib_avgf.o \
+	${BUILDTMP}/lib_maximumf.o \
+	${BUILDTMP}/lib_productf.o \
+	${BUILDTMP}/lib_vecmultiplyf.o \
+	${BUILDTMP}/lib_vecfusedmultiplyopsf.o \
+	${BUILDTMP}/lib_crypt_rc4.o 
 
 lib_sqrt32.o:
 	as ${ASM}/fa_sqrt32.s -o ${BUILDTMP}/lib_sqrt32.o

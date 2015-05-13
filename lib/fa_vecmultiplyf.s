@@ -1,4 +1,4 @@
-x// Fastarm 1.0
+// Fastarm 1.0
 // Copyright (c) David H. Christensen, 2015.
 // Licensed under the MIT license
 //
