@@ -8,6 +8,9 @@ float fa_maximumf(float* data, unsigned len);
 float fa_minimumf(float* data, unsigned len);
 
 unsigned fa_sqrt32(unsigned number);
+float fa_isqrtf(float number);
+float fa_isqrtf_fast(float number);
+
 
 /// destination = |a_i * b_i| for i from 0 to length
 void fa_vecmultiplyf(float* a, float* b, float* destination, unsigned length);

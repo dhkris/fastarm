@@ -11,9 +11,9 @@ TESTBINOUT=testbin
 LIBOUT=bin
 
 # Build everything
-all: test_sumf test_avgf test_productf test_sqrt32 test_vecmultiplyf test_vecfusedmultiplyf test_crypt_rc4 library
+all: library tests 
 
-library: lib_sqrt32.o lib_sumf.o lib_avgf.o lib_maximumf.o lib_productf.o lib_vecmultiplyf.o lib_vecfusedmultiplyopsf.o lib_crypt_rc4.o
+library: lib_isqrtf.o lib_sqrt32.o lib_sumf.o lib_avgf.o lib_maximumf.o lib_productf.o lib_vecmultiplyf.o lib_vecfusedmultiplyopsf.o lib_crypt_rc4.o
 	cc -shared -o ${LIBOUT}/libfastarm.so \
 	${BUILDTMP}/lib_sqrt32.o \
 	${BUILDTMP}/lib_sumf.o \
@@ -22,7 +22,11 @@ library: lib_sqrt32.o lib_sumf.o lib_avgf.o lib_maximumf.o lib_productf.o lib_ve
 	${BUILDTMP}/lib_productf.o \
 	${BUILDTMP}/lib_vecmultiplyf.o \
 	${BUILDTMP}/lib_vecfusedmultiplyopsf.o \
-	${BUILDTMP}/lib_crypt_rc4.o 
+	${BUILDTMP}/lib_crypt_rc4.o \
+	${BUILDTMP}/lib_isqrtf.o
+
+tests: test_sumf test_avgf test_productf test_sqrt32 test_vecmultiplyf test_vecfusedmultiplyf test_crypt_rc4 test_isqrtf
+
 
 lib_sqrt32.o:
 	as ${ASM}/fa_sqrt32.s -o ${BUILDTMP}/lib_sqrt32.o
@@ -37,6 +41,14 @@ lib_sumf.o:
 test_sumf: lib_sumf.o
 	cc -c ${TESTSRC}/test_sumf.c -o ${BUILDTMP}/test_sumf.o ${CFLAGS}
 	cc ${BUILDTMP}/lib_sumf.o ${BUILDTMP}/test_sumf.o -o ${TESTBINOUT}/test_sumf
+
+# FP32 fast inverse square root
+lib_isqrtf.o:
+	as ${ASM}/fa_isqrtf.s -o ${BUILDTMP}/lib_isqrtf.o
+test_isqrtf: lib_isqrtf.o
+	cc -c ${TESTSRC}/test_isqrtf.c -o ${BUILDTMP}/test_isqrtf.o ${CFLAGS}
+	cc ${BUILDTMP}/lib_isqrtf.o ${BUILDTMP}/test_isqrtf.o -o ${TESTBINOUT}/test_isqrtf
+
 
 # FP32 average
 lib_avgf.o:
