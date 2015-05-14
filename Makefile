@@ -11,7 +11,10 @@ TESTBINOUT=testbin
 LIBOUT=bin
 
 # Build everything
-all: library tests 
+all: dir library tests 
+
+dir:
+	mkdir ${BUILDTMP}
 
 library: lib_isqrtf.o lib_sqrt32.o lib_sumf.o lib_avgf.o lib_maximumf.o lib_productf.o lib_vecmultiplyf.o lib_vecfusedmultiplyopsf.o lib_crypt_rc4.o
 	cc -shared -o ${LIBOUT}/libfastarm.so \
