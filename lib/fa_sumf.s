@@ -4,6 +4,7 @@
 .arch armv6
 .fpu vfp
 
+.include "fastarm.s"
 
 .data
 .balign 4
@@ -28,6 +29,7 @@
 .global fa_sumf
 .func fa_sumf
 fa_sumf:
+	save_registers
 	// Initialize FP register
 	mov r5, #0
 	vmov s0, r5
@@ -37,10 +39,8 @@ fa_sumf:
 	add r1, r0
 
 	// Preserve link register, call and return
-	mov r10, lr
 	bl sumf_inner
-	mov lr, r10
-	vmov r0, s0
+	load_registers
 	bx lr
 
 // R0: Current

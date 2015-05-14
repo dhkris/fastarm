@@ -10,6 +10,9 @@
 	
 .arch armv6
 .fpu vfp
+
+.include "fastarm.s"
+
 .balign 4
 .text
 
@@ -22,15 +25,16 @@
 //
 //		Linking registers:
 //			R7:	fa_sqrt32 --> caller
-fa_sqrt32:			
+fa_sqrt32:		
+	save_registers	
 	MOV			r1, #1					// bit = 1
 	LSL			r1, #30					// bit <<= 30
 	MOV			r2, #0					// res = 0	
-	MOV			r7, lr
     BL 			.__lib_fa_sqrt32_loop1
     BL			.__lib_fa_sqrt32_loop2
     MOV			r0, r2					// return res
-    BX 			r7
+    load_registers
+    BX 			lr
 //-------------------------------------------------------
 
 .__lib_fa_sqrt32_loop1:			

@@ -10,6 +10,9 @@
 	
 .arch armv6
 .fpu vfp
+
+.include "fastarm.s"
+
 .balign 4
 .text
 
@@ -21,6 +24,7 @@
 // R0: Pointer to data
 // R1: Count
 fa_minimumf:
+	save_registers
     MOV 		r5, 	r1
     MOV 		r6, 	r0	
     LSL 		r5, 	#2
@@ -29,10 +33,10 @@ fa_minimumf:
     MOV 		r7, 	#0		
     VMOV.F32 	s0, 	r7	
     
-    MOV 		r8, 	lr
     BL 			.__lib_fa_minimumf_inner
     VMOV 		r0, 	s0
-    BX 			r8 
+    load_registers
+    BX 			lr 
 //-------------------------------------------------------
 
 .__lib_fa_minimumf_inner:

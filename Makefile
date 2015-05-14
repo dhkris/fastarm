@@ -3,7 +3,7 @@
 CFLAGS= -I ./header/
 
 #folder prefixes
-ASM=lib
+ASM=-I lib/ lib
 HEADERS=header
 TESTSRC=test
 BUILDTMP=build
@@ -11,7 +11,7 @@ TESTBINOUT=testbin
 LIBOUT=bin
 
 # Build everything
-all: test_sumf test_avgf test_productf test_sqrt32 test_vecmultiplyf test_vecfusedmultiplyf library
+all: test_sumf test_avgf test_productf test_sqrt32 test_vecmultiplyf test_vecfusedmultiplyf test_crypt_rc4 library
 
 library: lib_sqrt32.o lib_sumf.o lib_avgf.o lib_maximumf.o lib_productf.o lib_vecmultiplyf.o lib_vecfusedmultiplyopsf.o lib_crypt_rc4.o
 	cc -shared -o ${LIBOUT}/libfastarm.so \

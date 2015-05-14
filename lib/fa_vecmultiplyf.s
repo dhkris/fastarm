@@ -13,6 +13,9 @@
 //
 .arch armv6
 .fpu vfp
+
+.include "fastarm.s"
+
 .balign 4
 .text
 
@@ -26,11 +29,12 @@
 .func va_vecmultiplyf
 
 fa_vecmultiplyf:
+	save_registers
 	MOV			r5,     #0
 	LSL			r3,     #2
-	MOV			r8,     lr
 	BL			.fa_vecmultiplyf_loop
-	BX			r8
+	load_registers
+	BX			lr
 
 .fa_vecmultiplyf_loop:
 	VLDR.F32	s0,		[r0]

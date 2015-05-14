@@ -11,6 +11,9 @@
 	
 .arch armv6
 .fpu vfp
+
+.include "fastarm.s"
+
 .balign 4
 .text
 
@@ -22,6 +25,7 @@
 // R0: Pointer to data
 // R1: Count
 fa_maximumf:
+	save_registers
     MOV 		r5, 	r1			// Count
     MOV 		r6, 	r0			// Base offset
     
@@ -31,10 +35,10 @@ fa_maximumf:
     LSL 		r5, 	#2
     
     ADD 		r5, 	r6
-    MOV 		r8, 	lr
     BL 			.fa_maximumf_inner
     VMOV 		r0, 	s0
-    BX 			r8 
+    load_registers
+    BX 			lr 
 //-------------------------------------------------------
 
 .fa_maximumf_inner:

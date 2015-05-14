@@ -4,6 +4,8 @@
 .arch armv6
 .fpu vfp
 
+.include "fastarm.s"
+
 .balign 4
 .text
 
@@ -15,6 +17,7 @@
 
 // FP32 averaging function
 fa_avgf:
+	save_registers
 	mov r8, #0				// Set register to zero
 	vmov s0, r8				// Transfer to FP register
 	mov r7, lr				// Save link register
@@ -23,7 +26,7 @@ fa_avgf:
 	add r1, r0				// And we compute the end address...
 	bl avgf_inner				// Branch to avgf_inner
 	vmov r0, s0				// Copy return value into register
-	mov lr, r7				// Restore return address
+	load_registers
 	bx lr					// Return from this function
 
 avgf_inner:

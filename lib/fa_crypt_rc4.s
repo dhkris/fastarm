@@ -6,6 +6,8 @@
 .data
 .text
 
+.include "fastarm.s"
+
 .global fa_rc4_prepare
 .func fa_rc4_prepare
 
@@ -13,6 +15,7 @@
 
 // r0: Output pointer, preallocated
 fa_rc4_prepare:
+	save_registers
 	MOV 	r4,		#(1 << 8) // base value
 	ORR		r4,		#(2 << 16)
 	ORR		r4,		#(4 << 24)
@@ -25,13 +28,14 @@ fa_rc4_prepare:
 	ADD 	r3,		#256
 	MOV		r8, 	lr					// We don't need no stackification'
 	BL		.fa_rc4_prepare_loop1
-	BX		r8
+	load_registers
+	BX		lr
 
 .balign 4
 .fa_rc4_prepare_loop1:
 	STR 	r4,		[r2]
 	UADD8 	r4, 	r4, 	r5	// 4x byte parallel additions
-	ADD 	r2, 	#4
+	ADD 	r2, 	#4			// Another 4 bytes ahead...
 	CMP 	r2, 	r3
 	BXEQ 	lr
 	BNE 	.fa_rc4_prepare_loop1
@@ -121,10 +125,7 @@ fa_rc4_encrypt:
 	ADD		r7,		#1
 	CMP		r7,		r1
 	BNE		.fa_rc4_encrypt_pass
-	BXEQ	lr
-	
-	ADD		r7,		#1
-	
+	BXEQ	lr 	
 
 .endfunc
 

@@ -12,6 +12,9 @@
 	
 .arch armv6
 .fpu vfp
+
+.include "fastarm.s"
+
 .balign 4
 .text
 
@@ -23,6 +26,7 @@
 // R0: Pointer to data
 // R1: Count
 fa_productf:
+	save_registers
     MOV r5, r1			// Count
     MOV r6, r0			// Base offset
     
@@ -32,13 +36,12 @@ fa_productf:
     VCVT.F32.U32 s0, s2
     
     // Count *= 4 (bytes)
-    LSL r5, #2
+    LSL 	r5, #2
     
-    ADD r5, r6 // End = size + start
-    MOV r8, lr // Save return address
-    BL .productf_inner	// Calculate
-    VMOV r0, s0     // Copy FP value into return register
-    BX r8 			// Return to caller
+    ADD 	r5, r6 // End = size + start
+    BL 		.productf_inner	// Calculate
+    load_registers
+    BX 		lr 			// Return to caller
 //-------------------------------------------------------
 
 .productf_inner:

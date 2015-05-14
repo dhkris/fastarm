@@ -7,8 +7,33 @@
 //
 .arch armv6
 .fpu vfp
+
+.include "fastarm.s"
+
 .balign 4
 .text
+
+// The fastest possible FMA implementation. Requires that input data
+// be stored in a packed format:
+//
+// | Position  | 3n | 3n+1 | 3n+2 |
+// |   Datum   | an |  bn  |  cn  |
+//
+// The function implements the general calculation:
+// out[i] = in[3i] + (in[3i+1] * in[3i+2])
+//
+// In other words,
+// out[0] = in[0] + (in[1] * in[2])
+// out[1] = in[3] + (in[4] * in[5])
+// and so on...
+//
+// Use the utility function, float* fa_vecpack3(float* a, float* b, float* c, unsigned count)
+// to generate a packed pointer suitable for this
+.global fa_vecpacked_fmaf
+.balign 4
+.func fa_vecpacked_fmaf
+
+.endfunc
 
 // For I in [0; length[:
 //		a[i] = a[I] + (b[I] + c[I])
@@ -21,12 +46,13 @@
 .func fa_vecfmaf
 
 fa_vecfmaf:
+	save_registers
 	MOV			r5,     #0
 	LSL			r3,     #2
-	MOV			r8,     lr
 	BL			.fa_vecfmaf_loop
 	SUB			r0,     r5
-	BX			r8
+	load_registers
+	BX			lr
 
 .fa_vecfmaf_loop:
 	VLDR.F32	s0,		[r0]            // a_i
@@ -55,12 +81,13 @@ fa_vecfmaf:
 .func fa_vecfmsf
 
 fa_vecfmsf:
+	save_registers
 	MOV			r5, #0
 	LSL			r3, #2
-	MOV			r8, lr
 	BL			.fa_vecfmsf_loop
 	SUB			r0, r5
-	BX			r8
+	load_registers
+	BX			lr
 
 .fa_vecfmsf_loop:
 	VLDR.F32	s0,		[r0]		// a_i
