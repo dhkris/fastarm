@@ -17,6 +17,7 @@
 
 // r0: x [uint32], r1: S
 fa_blowfish_sboxexpn:
+    PUSH {r4}
     MOV r3, r0
     LSR r3, #24
     LDR r2, [r1, r3]    // S[0][x >> 24]
@@ -45,7 +46,9 @@ fa_blowfish_sboxexpn:
     LDR r4, [r1, r3]
     ADD r2, r4          // h + S[3][x % 256]
 
+    POP {r4}            // we need to restore this register...
     MOV r0, r2          // return h
+    BX  lr
 
 
 
